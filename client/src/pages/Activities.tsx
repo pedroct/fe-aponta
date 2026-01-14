@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { ChevronDown, Search, Filter, MoreHorizontal, Check, X, User, Edit2, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 // --- Components mimicking Azure DevOps UI ---
 
@@ -33,7 +34,7 @@ const ADOInput = ({ label, placeholder, className, ...props }: React.InputHTMLAt
   );
 };
 
-const ADODropdown = ({ label, options, placeholder = "Select...", className }: { label?: string; options: string[]; placeholder?: string; className?: string }) => {
+const ADODropdown = ({ label, options, placeholder = "Select...", className, onSelect }: { label?: string; options: string[]; placeholder?: string; className?: string; onSelect?: (val: string) => void }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
 
@@ -60,6 +61,7 @@ const ADODropdown = ({ label, options, placeholder = "Select...", className }: {
               onClick={() => {
                 setSelected(opt);
                 setIsOpen(false);
+                if (onSelect) onSelect(opt);
               }}
             >
               {opt}
@@ -71,7 +73,7 @@ const ADODropdown = ({ label, options, placeholder = "Select...", className }: {
   );
 };
 
-const ADOTable = ({ data }: { data: any[] }) => {
+const ADOTable = ({ data, onEdit, onDelete }: { data: any[]; onEdit?: (row: any) => void; onDelete?: (row: any) => void }) => {
   return (
     <div className="w-full overflow-x-auto">
       <table className="w-full text-left border-collapse">
@@ -108,10 +110,16 @@ const ADOTable = ({ data }: { data: any[] }) => {
               </td>
               <td className="py-3 px-4 text-sm text-[#201F1E] text-right">
                 <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button className="p-1.5 hover:bg-[#E1DFDD] rounded-sm text-[#605E5C] hover:text-[#0078D4]" title="Editar">
+                  <button 
+                    onClick={() => onEdit && onEdit(row)}
+                    className="p-1.5 hover:bg-[#E1DFDD] rounded-sm text-[#605E5C] hover:text-[#0078D4]" title="Editar"
+                  >
                     <Edit2 size={14} />
                   </button>
-                  <button className="p-1.5 hover:bg-[#FDE7E9] rounded-sm text-[#605E5C] hover:text-[#A80000]" title="Excluir">
+                  <button 
+                    onClick={() => onDelete && onDelete(row)}
+                    className="p-1.5 hover:bg-[#FDE7E9] rounded-sm text-[#605E5C] hover:text-[#A80000]" title="Excluir"
+                  >
                     <Trash2 size={14} />
                   </button>
                 </div>
@@ -135,6 +143,43 @@ const MOCK_DATA = [
 ];
 
 export default function ActivitiesPage() {
+  const { toast } = useToast();
+  const [activityName, setActivityName] = useState("");
+  const [selectedProject, setSelectedProject] = useState("");
+
+  const handleSave = () => {
+    if (!activityName.trim() || !selectedProject) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Por favor, preencha o nome da atividade e selecione um projeto.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Sucesso",
+      description: "Atividade registrada com sucesso!",
+    });
+    setActivityName("");
+    // Resetting dropdown state would require lifting more state, but for mockup this is fine
+  };
+
+  const handleEdit = (row: any) => {
+    toast({
+      title: "Editar Atividade",
+      description: `Editando a atividade: ${row.activity}`,
+    });
+  };
+
+  const handleDelete = (row: any) => {
+    toast({
+      title: "Atividade removida",
+      description: `A atividade "${row.activity}" foi excluída.`,
+      variant: "destructive",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-[#FAF9F8] flex flex-col font-[Segoe UI]">
       {/* Content */}
@@ -143,13 +188,26 @@ export default function ActivitiesPage() {
         <ADOHeader title="Gestão de Atividades">
           <div className="flex flex-row gap-4 w-full max-w-4xl pb-1">
             <div className="flex-1">
-              <ADOInput label="Nome da atividade" placeholder="Digite o nome da atividade" />
+              <ADOInput 
+                label="Nome da atividade" 
+                placeholder="Digite o nome da atividade" 
+                value={activityName}
+                onChange={(e) => setActivityName(e.target.value)}
+              />
             </div>
             <div className="w-64">
-              <ADODropdown label="Projeto" options={["Sistema Web", "Backend Core", "Infraestrutura", "Wiki Interna"]} placeholder="Selecione um projeto" />
+              <ADODropdown 
+                label="Projeto" 
+                options={["Sistema Web", "Backend Core", "Infraestrutura", "Wiki Interna"]} 
+                placeholder="Selecione um projeto"
+                onSelect={(val) => setSelectedProject(val)}
+              />
             </div>
             <div className="flex items-end pb-[2px]">
-              <button className="h-8 px-4 bg-[#0078D4] text-white text-sm font-semibold rounded-sm hover:bg-[#106EBE] flex items-center gap-2">
+              <button 
+                onClick={handleSave}
+                className="h-8 px-4 bg-[#0078D4] text-white text-sm font-semibold rounded-sm hover:bg-[#106EBE] flex items-center gap-2"
+              >
                 <Check className="w-4 h-4" />
                 Salvar
               </button>
@@ -178,7 +236,7 @@ export default function ActivitiesPage() {
             
             {/* Table Component */}
             <div className="bg-white">
-              <ADOTable data={MOCK_DATA} />
+              <ADOTable data={MOCK_DATA} onEdit={handleEdit} onDelete={handleDelete} />
             </div>
           </div>
         </div>
