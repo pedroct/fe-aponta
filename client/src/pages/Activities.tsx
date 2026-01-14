@@ -125,7 +125,7 @@ const MOCK_DATA = [
 
 export default function ActivitiesPage() {
   return (
-    <div className="min-h-screen bg-white flex flex-col font-[Segoe UI]">
+    <div className="min-h-screen bg-[#FAF9F8] flex flex-col font-[Segoe UI]">
       {/* Content */}
       <div className="flex-1 flex flex-col">
         {/* Header with Form Fields */}
@@ -146,10 +146,10 @@ export default function ActivitiesPage() {
           </div>
         </ADOHeader>
 
-        <div className="p-4 md:p-8">
-          <div className="bg-white rounded shadow-[0_1.6px_3.6px_0_rgba(0,0,0,0.132),0_0.3px_0.9px_0_rgba(0,0,0,0.108)]">
+        <div className="p-4 md:p-8 flex-1">
+          <div className="bg-white rounded shadow-[0_1.6px_3.6px_0_rgba(0,0,0,0.132),0_0.3px_0.9px_0_rgba(0,0,0,0.108)] overflow-hidden">
             {/* Toolbar for Table */}
-            <div className="px-4 py-3 border-b border-[#EAEAEA] flex justify-between items-center">
+            <div className="px-4 py-3 border-b border-[#EAEAEA] flex justify-between items-center bg-white">
               <div className="flex gap-2">
                 <button className="flex items-center gap-1 text-sm text-[#201F1E] hover:bg-[#F3F2F1] px-2 py-1 rounded-sm">
                   <Filter className="w-4 h-4 text-[#0078D4]" />
@@ -166,7 +166,9 @@ export default function ActivitiesPage() {
             </div>
             
             {/* Table Component */}
-            <ADOTable data={MOCK_DATA} />
+            <div className="bg-white">
+              <ADOTable data={MOCK_DATA} />
+            </div>
           </div>
         </div>
       </div>
