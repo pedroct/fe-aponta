@@ -125,78 +125,48 @@ const MOCK_DATA = [
 
 export default function ActivitiesPage() {
   return (
-    <div className="min-h-screen bg-[#FAF9F8] flex flex-col font-[Segoe UI]">
-      {/* Top Navigation Bar Simulation */}
-      <div className="h-12 bg-[#005A9E] flex items-center px-4 justify-between shrink-0">
-         <div className="text-white font-semibold text-lg">Azure DevOps</div>
-         <div className="flex gap-4">
-            <div className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-white cursor-pointer">
-               <User size={16} />
+    <div className="min-h-screen bg-white flex flex-col font-[Segoe UI]">
+      {/* Content */}
+      <div className="flex-1 flex flex-col">
+        {/* Header with Form Fields */}
+        <ADOHeader title="Gestão de Atividades">
+          <div className="flex flex-row gap-4 w-full max-w-4xl pb-1">
+            <div className="flex-1">
+              <ADOInput label="Nome da atividade" placeholder="Digite o nome da atividade" />
             </div>
-         </div>
-      </div>
-
-      {/* Main Content Area */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar Simulation */}
-        <div className="w-12 md:w-48 bg-[#F3F2F1] border-r border-[#C8C6C4] hidden md:flex flex-col pt-4">
-           <div className="px-4 py-2 font-semibold text-[#201F1E] hover:bg-[#E1DFDD] cursor-pointer bg-[#E1DFDD] border-l-4 border-[#0078D4]">
-              Visão Geral
-           </div>
-           <div className="px-4 py-2 text-[#201F1E] hover:bg-[#E1DFDD] cursor-pointer border-l-4 border-transparent">
-              Boards
-           </div>
-           <div className="px-4 py-2 text-[#201F1E] hover:bg-[#E1DFDD] cursor-pointer border-l-4 border-transparent">
-              Repos
-           </div>
-           <div className="px-4 py-2 text-[#201F1E] hover:bg-[#E1DFDD] cursor-pointer border-l-4 border-transparent">
-              Pipelines
-           </div>
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 flex flex-col overflow-y-auto">
-          
-          {/* Header with Form Fields */}
-          <ADOHeader title="Gestão de Atividades">
-             <div className="flex flex-row gap-4 w-full max-w-4xl pb-1">
-                <div className="flex-1">
-                   <ADOInput label="Nome da atividade" placeholder="Digite o nome da atividade" />
-                </div>
-                <div className="w-64">
-                   <ADODropdown label="Projeto" options={["Sistema Web", "Backend Core", "Infraestrutura", "Wiki Interna"]} placeholder="Selecione um projeto" />
-                </div>
-                <div className="flex items-end pb-[2px]">
-                   <button className="h-8 px-4 bg-[#0078D4] text-white text-sm font-semibold rounded-sm hover:bg-[#106EBE] flex items-center gap-2">
-                      <Check className="w-4 h-4" />
-                      Salvar
-                   </button>
-                </div>
-             </div>
-          </ADOHeader>
-
-          <div className="p-4 md:p-8">
-            <div className="bg-white rounded shadow-[0_1.6px_3.6px_0_rgba(0,0,0,0.132),0_0.3px_0.9px_0_rgba(0,0,0,0.108)]">
-               {/* Toolbar for Table */}
-               <div className="px-4 py-3 border-b border-[#EAEAEA] flex justify-between items-center">
-                  <div className="flex gap-2">
-                     <button className="flex items-center gap-1 text-sm text-[#201F1E] hover:bg-[#F3F2F1] px-2 py-1 rounded-sm">
-                        <Filter className="w-4 h-4 text-[#0078D4]" />
-                        <span>Filtrar</span>
-                     </button>
-                  </div>
-                  <div className="relative">
-                     <Search className="w-4 h-4 absolute left-2 top-1.5 text-[#605E5C]" />
-                     <input 
-                        className="h-8 pl-8 pr-4 text-sm border border-transparent hover:border-[#605E5C] focus:border-[#0078D4] rounded-sm w-48 transition-colors"
-                        placeholder="Pesquisar atividades..."
-                     />
-                  </div>
-               </div>
-               
-               {/* Table Component */}
-               <ADOTable data={MOCK_DATA} />
+            <div className="w-64">
+              <ADODropdown label="Projeto" options={["Sistema Web", "Backend Core", "Infraestrutura", "Wiki Interna"]} placeholder="Selecione um projeto" />
             </div>
+            <div className="flex items-end pb-[2px]">
+              <button className="h-8 px-4 bg-[#0078D4] text-white text-sm font-semibold rounded-sm hover:bg-[#106EBE] flex items-center gap-2">
+                <Check className="w-4 h-4" />
+                Salvar
+              </button>
+            </div>
+          </div>
+        </ADOHeader>
+
+        <div className="p-4 md:p-8">
+          <div className="bg-white rounded shadow-[0_1.6px_3.6px_0_rgba(0,0,0,0.132),0_0.3px_0.9px_0_rgba(0,0,0,0.108)]">
+            {/* Toolbar for Table */}
+            <div className="px-4 py-3 border-b border-[#EAEAEA] flex justify-between items-center">
+              <div className="flex gap-2">
+                <button className="flex items-center gap-1 text-sm text-[#201F1E] hover:bg-[#F3F2F1] px-2 py-1 rounded-sm">
+                  <Filter className="w-4 h-4 text-[#0078D4]" />
+                  <span>Filtrar</span>
+                </button>
+              </div>
+              <div className="relative">
+                <Search className="w-4 h-4 absolute left-2 top-1.5 text-[#605E5C]" />
+                <input 
+                  className="h-8 pl-8 pr-4 text-sm border border-transparent hover:border-[#605E5C] focus:border-[#0078D4] rounded-sm w-48 transition-colors"
+                  placeholder="Pesquisar atividades..."
+                />
+              </div>
+            </div>
+            
+            {/* Table Component */}
+            <ADOTable data={MOCK_DATA} />
           </div>
         </div>
       </div>
