@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ChevronDown, Search, Filter, MoreHorizontal, Check, X, User } from "lucide-react";
+import { ChevronDown, Search, Filter, MoreHorizontal, Check, X, User, Edit2, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // --- Components mimicking Azure DevOps UI ---
@@ -81,6 +81,7 @@ const ADOTable = ({ data }: { data: any[] }) => {
             <th className="py-2.5 px-4 text-xs font-semibold text-[#605E5C] uppercase tracking-wider">Projeto</th>
             <th className="py-2.5 px-4 text-xs font-semibold text-[#605E5C] uppercase tracking-wider">Situação</th>
             <th className="py-2.5 px-4 text-xs font-semibold text-[#605E5C] uppercase tracking-wider">Criado por</th>
+            <th className="py-2.5 px-4 text-xs font-semibold text-[#605E5C] uppercase tracking-wider text-right">Ações</th>
           </tr>
         </thead>
         <tbody>
@@ -104,6 +105,16 @@ const ADOTable = ({ data }: { data: any[] }) => {
                     {row.createdBy.charAt(0)}
                  </div>
                  {row.createdBy}
+              </td>
+              <td className="py-3 px-4 text-sm text-[#201F1E] text-right">
+                <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button className="p-1.5 hover:bg-[#E1DFDD] rounded-sm text-[#605E5C] hover:text-[#0078D4]" title="Editar">
+                    <Edit2 size={14} />
+                  </button>
+                  <button className="p-1.5 hover:bg-[#FDE7E9] rounded-sm text-[#605E5C] hover:text-[#A80000]" title="Excluir">
+                    <Trash2 size={14} />
+                  </button>
+                </div>
               </td>
             </tr>
           ))}
