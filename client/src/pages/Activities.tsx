@@ -1,7 +1,12 @@
 import React, { useState } from "react";
-import { ChevronDown, Search, Filter, MoreHorizontal, Check, X, User, Edit2, Trash2 } from "lucide-react";
+import { ChevronDown, Search, Filter, MoreHorizontal, Check, X, User, Edit2, Trash2, Calendar as CalendarIcon, Clock, MessageSquare, Plus, Save } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
 
 // --- Components mimicking Azure DevOps UI ---
 
@@ -11,44 +16,48 @@ const ADOHeader = ({ title, children }: { title: string; children?: React.ReactN
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold text-[#201F1E]">{title}</h1>
       </div>
-      {children && <div className="flex items-end gap-4">{children}</div>}
+      {children && <div className="flex items-end gap-6">{children}</div>}
     </div>
   );
 };
 
-const ADOInput = ({ label, placeholder, className, ...props }: React.InputHTMLAttributes<HTMLInputElement> & { label?: string }) => {
-  return (
-    <div className="flex flex-col gap-1.5 w-full">
-      {label && <label className="text-sm font-semibold text-[#201F1E]">{label}</label>}
-      <div className="relative group">
-        <input
-          className={cn(
-            "w-full h-8 px-2 text-sm border border-[#605E5C] rounded-sm hover:border-[#323130] focus:outline-none focus:border-[#0078D4] focus:ring-1 focus:ring-[#0078D4] transition-colors placeholder:text-[#605E5C]",
-            className
-          )}
-          placeholder={placeholder}
-          {...props}
-        />
-      </div>
-    </div>
-  );
-};
+const ADOField = ({ label, children, className }: { label: string; children: React.ReactNode; className?: string }) => (
+  <div className={cn("flex flex-col gap-1.5 w-full", className)}>
+    <label className="text-xs font-semibold text-[#605E5C]">{label}</label>
+    {children}
+  </div>
+);
 
-const ADODropdown = ({ label, options, placeholder = "Select...", className, onSelect }: { label?: string; options: string[]; placeholder?: string; className?: string; onSelect?: (val: string) => void }) => {
+const ADODropdown = ({ 
+  label, 
+  options, 
+  placeholder = "Select...", 
+  className, 
+  onSelect,
+  value 
+}: { 
+  label?: string; 
+  options: (string | number)[]; 
+  placeholder?: string; 
+  className?: string; 
+  onSelect?: (val: string) => void;
+  value?: string | number;
+}) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selected, setSelected] = useState<string | null>(null);
 
   return (
     <div className="flex flex-col gap-1.5 w-full relative">
-      {label && <label className="text-sm font-semibold text-[#201F1E]">{label}</label>}
+      {label && <label className="text-xs font-semibold text-[#605E5C]">{label}</label>}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "w-full h-8 px-2 text-sm border border-[#605E5C] rounded-sm hover:border-[#323130] focus:outline-none focus:border-[#0078D4] focus:ring-1 focus:ring-[#0078D4] bg-white flex items-center justify-between text-left",
+          "w-full h-8 px-2 text-sm border border-[#C8C6C4] rounded-sm hover:border-[#323130] focus:outline-none focus:border-[#0078D4] focus:ring-1 focus:ring-[#0078D4] bg-white flex items-center justify-between text-left transition-colors",
           className
         )}
       >
-        <span className={selected ? "text-[#201F1E]" : "text-[#605E5C]"}>{selected || placeholder}</span>
+        <span className={value !== undefined ? "text-[#201F1E]" : "text-[#605E5C]"}>
+          {value !== undefined ? value.toString() : placeholder}
+        </span>
         <ChevronDown className="w-4 h-4 text-[#605E5C]" />
       </button>
       
@@ -57,11 +66,10 @@ const ADODropdown = ({ label, options, placeholder = "Select...", className, onS
           {options.map((opt) => (
             <div
               key={opt}
-              className="px-3 py-2 text-sm text-[#201F1E] hover:bg-[#F3F2F1] cursor-pointer"
+              className="px-3 py-1.5 text-sm text-[#201F1E] hover:bg-[#F3F2F1] cursor-pointer"
               onClick={() => {
-                setSelected(opt);
                 setIsOpen(false);
-                if (onSelect) onSelect(opt);
+                if (onSelect) onSelect(opt.toString());
               }}
             >
               {opt}
@@ -78,47 +86,43 @@ const ADOTable = ({ data, onEdit, onDelete }: { data: any[]; onEdit?: (row: any)
     <div className="w-full overflow-x-auto">
       <table className="w-full text-left border-collapse">
         <thead>
-          <tr className="border-b border-[#EAEAEA]">
-            <th className="py-2.5 px-4 text-xs font-semibold text-[#605E5C] uppercase tracking-wider">Atividade</th>
-            <th className="py-2.5 px-4 text-xs font-semibold text-[#605E5C] uppercase tracking-wider">Projeto</th>
-            <th className="py-2.5 px-4 text-xs font-semibold text-[#605E5C] uppercase tracking-wider">Situação</th>
-            <th className="py-2.5 px-4 text-xs font-semibold text-[#605E5C] uppercase tracking-wider">Criado por</th>
-            <th className="py-2.5 px-4 text-xs font-semibold text-[#605E5C] uppercase tracking-wider text-right">Ações</th>
+          <tr className="border-b border-[#EAEAEA] bg-[#FAF9F8]">
+            <th className="py-2 px-4 text-xs font-semibold text-[#605E5C] w-32">Data</th>
+            <th className="py-2 px-4 text-xs font-semibold text-[#605E5C] w-40">Tempo apontado</th>
+            <th className="py-2 px-4 text-xs font-semibold text-[#605E5C] w-48">Apontado por</th>
+            <th className="py-2 px-4 text-xs font-semibold text-[#605E5C] w-48">Atividade</th>
+            <th className="py-2 px-4 text-xs font-semibold text-[#605E5C]">Comentário</th>
+            <th className="py-2 px-4 text-xs font-semibold text-[#605E5C] text-center w-24">Ações</th>
           </tr>
         </thead>
         <tbody>
           {data.map((row, i) => (
             <tr key={i} className="group hover:bg-[#F3F2F1] border-b border-[#EAEAEA] last:border-0 transition-colors">
-              <td className="py-3 px-4 text-sm text-[#201F1E] font-medium">{row.activity}</td>
-              <td className="py-3 px-4 text-sm text-[#201F1E]">{row.project}</td>
-              <td className="py-3 px-4 text-sm">
+              <td className="py-2.5 px-4 text-sm text-[#201F1E]">{row.date}</td>
+              <td className="py-2.5 px-4 text-sm text-[#201F1E]">{row.time}</td>
+              <td className="py-2.5 px-4 text-sm text-[#201F1E]">
                 <div className="flex items-center gap-2">
-                  <span
-                    className={cn(
-                      "w-2 h-2 rounded-full",
-                      row.status === "Ativo" ? "bg-green-600" : "bg-gray-400"
-                    )}
-                  />
-                  <span className="text-[#201F1E]">{row.status}</span>
+                  <div className="w-6 h-6 rounded-full bg-[#0078D4] text-white flex items-center justify-center text-[10px] font-bold">
+                    {row.user.split(' ').map((n: string) => n[0]).join('').toUpperCase()}
+                  </div>
+                  {row.user}
                 </div>
               </td>
-              <td className="py-3 px-4 text-sm text-[#201F1E] flex items-center gap-2">
-                 <div className="w-6 h-6 rounded-full bg-[#0078D4] text-white flex items-center justify-center text-xs">
-                    {row.createdBy.charAt(0)}
-                 </div>
-                 {row.createdBy}
+              <td className="py-2.5 px-4 text-sm text-[#201F1E] font-medium">{row.activity}</td>
+              <td className="py-2.5 px-4 text-sm text-[#605E5C] truncate max-w-xs" title={row.comment}>
+                {row.comment}
               </td>
-              <td className="py-3 px-4 text-sm text-[#201F1E] text-right">
-                <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <td className="py-2.5 px-4 text-sm text-[#201F1E] text-center">
+                <div className="flex justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button 
                     onClick={() => onEdit && onEdit(row)}
-                    className="p-1.5 hover:bg-[#E1DFDD] rounded-sm text-[#605E5C] hover:text-[#0078D4]" title="Editar"
+                    className="p-1 hover:bg-[#E1DFDD] rounded-sm text-[#605E5C] hover:text-[#0078D4]" title="Editar"
                   >
                     <Edit2 size={14} />
                   </button>
                   <button 
                     onClick={() => onDelete && onDelete(row)}
-                    className="p-1.5 hover:bg-[#FDE7E9] rounded-sm text-[#605E5C] hover:text-[#A80000]" title="Excluir"
+                    className="p-1 hover:bg-[#FDE7E9] rounded-sm text-[#605E5C] hover:text-[#A80000]" title="Excluir"
                   >
                     <Trash2 size={14} />
                   </button>
@@ -135,23 +139,28 @@ const ADOTable = ({ data, onEdit, onDelete }: { data: any[]; onEdit?: (row: any)
 // --- Page Implementation ---
 
 const MOCK_DATA = [
-  { activity: "Implementação de Login", project: "Sistema Web", status: "Ativo", createdBy: "João Silva" },
-  { activity: "Correção de Bugs da API", project: "Backend Core", status: "Ativo", createdBy: "Maria Souza" },
-  { activity: "Atualização de Documentação", project: "Wiki Interna", status: "Inativo", createdBy: "Carlos Oliveira" },
-  { activity: "Design da Home Page", project: "Sistema Web", status: "Ativo", createdBy: "Ana Pereira" },
-  { activity: "Configuração de CI/CD", project: "Infraestrutura", status: "Ativo", createdBy: "Pedro Santos" },
+  { date: "16/01/2026", time: "01:30", user: "Pedro Teixeira", activity: "Refinamento Funcional", comment: "Discussão sobre os requisitos da nova tela." },
+  { date: "15/01/2026", time: "04:00", user: "Laurêncio Lima", activity: "Desenvolvimento Frontend", comment: "Criação dos componentes base." },
+  { date: "15/01/2026", time: "02:15", user: "Pedro Teixeira", activity: "Code Review", comment: "Revisão do PR #123." },
 ];
 
 export default function ActivitiesPage() {
   const { toast } = useToast();
-  const [activityName, setActivityName] = useState("");
-  const [selectedProject, setSelectedProject] = useState("");
+  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [hours, setHours] = useState<string>("0");
+  const [minutes, setMinutes] = useState<string>("00");
+  const [activity, setActivity] = useState<string>("");
+  const [comment, setComment] = useState("");
+
+  const ACTIVITIES = ["Refinamento Funcional", "Desenvolvimento Frontend", "Code Review", "Reunião de Alinhamento", "Testes QA"];
+  const HOURS_OPTIONS = Array.from({ length: 9 }, (_, i) => i);
+  const MINUTES_OPTIONS = ["00", "15", "30", "45"];
 
   const handleSave = () => {
-    if (!activityName.trim() || !selectedProject) {
+    if (!activity) {
       toast({
         title: "Campos obrigatórios",
-        description: "Por favor, preencha o nome da atividade e selecione um projeto.",
+        description: "Por favor, selecione uma atividade.",
         variant: "destructive",
       });
       return;
@@ -159,85 +168,114 @@ export default function ActivitiesPage() {
 
     toast({
       title: "Sucesso",
-      description: "Atividade registrada com sucesso!",
+      description: "Apontamento registrado com sucesso!",
     });
-    setActivityName("");
-    // Resetting dropdown state would require lifting more state, but for mockup this is fine
+    
+    // Reset fields
+    setComment("");
+    setActivity("");
   };
 
   const handleEdit = (row: any) => {
     toast({
-      title: "Editar Atividade",
-      description: `Editando a atividade: ${row.activity}`,
+      title: "Editar Apontamento",
+      description: `Editando o apontamento de: ${row.date}`,
     });
   };
 
   const handleDelete = (row: any) => {
     toast({
-      title: "Atividade removida",
-      description: `A atividade "${row.activity}" foi excluída.`,
+      title: "Apontamento removido",
+      description: "O apontamento foi excluído.",
       variant: "destructive",
     });
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF9F8] flex flex-col font-[Segoe UI]">
+    <div className="min-h-screen bg-[#FAF9F8] flex flex-col font-['Segoe_UI',_Tahoma,_Geneva,_Verdana,_sans-serif]">
       {/* Content */}
       <div className="flex-1 flex flex-col">
         {/* Header with Form Fields */}
-        <ADOHeader title="Gestão de Atividades">
-          <div className="flex flex-row gap-4 w-full max-w-4xl pb-1">
-            <div className="flex-1">
-              <ADOInput 
-                label="Nome da atividade" 
-                placeholder="Digite o nome da atividade" 
-                value={activityName}
-                onChange={(e) => setActivityName(e.target.value)}
+        <ADOHeader title="Apontamento de Horas">
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-4 w-full items-end pb-1">
+            
+            {/* Data */}
+            <ADOField label="Data">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button className="w-full h-8 px-2 text-sm border border-[#C8C6C4] rounded-sm hover:border-[#323130] focus:outline-none focus:border-[#0078D4] focus:ring-1 focus:ring-[#0078D4] bg-white flex items-center gap-2 text-[#201F1E]">
+                    <CalendarIcon className="w-3.5 h-3.5 text-[#605E5C]" />
+                    {date ? format(date, "dd/MM/yyyy", { locale: ptBR }) : "dd/mm/aaaa"}
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={setDate}
+                    initialFocus
+                    locale={ptBR}
+                  />
+                </PopoverContent>
+              </Popover>
+            </ADOField>
+
+            {/* Hora */}
+            <ADODropdown 
+              label="Hora" 
+              options={HOURS_OPTIONS} 
+              value={hours}
+              onSelect={setHours}
+            />
+
+            {/* Minutos */}
+            <ADODropdown 
+              label="Minutos" 
+              options={MINUTES_OPTIONS} 
+              value={minutes}
+              onSelect={setMinutes}
+            />
+
+            {/* Atividade */}
+            <ADODropdown 
+              label="Atividade" 
+              options={ACTIVITIES} 
+              placeholder="Selecionar..."
+              value={activity}
+              onSelect={setActivity}
+            />
+
+            {/* Comentário */}
+            <ADOField label="Comentário">
+              <input 
+                type="text"
+                maxLength={100}
+                placeholder="Comentário"
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                className="w-full h-8 px-2 text-sm border border-[#C8C6C4] rounded-sm hover:border-[#323130] focus:outline-none focus:border-[#0078D4] focus:ring-1 focus:ring-[#0078D4] transition-colors placeholder:text-[#605E5C]"
+                data-testid="input-comment"
               />
-            </div>
-            <div className="w-64">
-              <ADODropdown 
-                label="Projeto" 
-                options={["Sistema Web", "Backend Core", "Infraestrutura", "Wiki Interna"]} 
-                placeholder="Selecione um projeto"
-                onSelect={(val) => setSelectedProject(val)}
-              />
-            </div>
-            <div className="flex items-end pb-[2px]">
+            </ADOField>
+
+            {/* Botão Salvar */}
+            <div className="flex">
               <button 
                 onClick={handleSave}
-                className="h-8 px-4 bg-[#0078D4] text-white text-sm font-semibold rounded-sm hover:bg-[#106EBE] flex items-center gap-2"
+                className="h-8 px-4 bg-[#0078D4] text-white text-sm font-semibold rounded-sm hover:bg-[#106EBE] flex items-center justify-center gap-2 transition-colors w-full"
+                data-testid="button-save"
               >
-                <Check className="w-4 h-4" />
+                <Save className="w-4 h-4" />
                 Salvar
               </button>
             </div>
           </div>
         </ADOHeader>
 
-        <div className="p-4 md:p-8 flex-1">
-          <div className="bg-white rounded shadow-[0_1.6px_3.6px_0_rgba(0,0,0,0.132),0_0.3px_0.9px_0_rgba(0,0,0,0.108)] overflow-hidden">
-            {/* Toolbar for Table */}
-            <div className="px-4 py-3 border-b border-[#EAEAEA] flex justify-between items-center bg-white">
-              <div className="flex gap-2">
-                <button className="flex items-center gap-1 text-sm text-[#201F1E] hover:bg-[#F3F2F1] px-2 py-1 rounded-sm">
-                  <Filter className="w-4 h-4 text-[#0078D4]" />
-                  <span>Filtrar</span>
-                </button>
-              </div>
-              <div className="relative">
-                <Search className="w-4 h-4 absolute left-2 top-1.5 text-[#605E5C]" />
-                <input 
-                  className="h-8 pl-8 pr-4 text-sm border border-transparent hover:border-[#605E5C] focus:border-[#0078D4] rounded-sm w-48 transition-colors"
-                  placeholder="Pesquisar atividades..."
-                />
-              </div>
-            </div>
-            
+        <div className="p-4 md:p-6 flex-1">
+          <div className="bg-white rounded-sm shadow-[0_1.6px_3.6px_0_rgba(0,0,0,0.132),0_0.3px_0.9px_0_rgba(0,0,0,0.108)] overflow-hidden">
             {/* Table Component */}
-            <div className="bg-white">
-              <ADOTable data={MOCK_DATA} onEdit={handleEdit} onDelete={handleDelete} />
-            </div>
+            <ADOTable data={MOCK_DATA} onEdit={handleEdit} onDelete={handleDelete} />
           </div>
         </div>
       </div>
