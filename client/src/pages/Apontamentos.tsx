@@ -174,7 +174,7 @@ const MOCK_DATA = [
   { date: "15/01/2026", time: "02:15", user: "Pedro Teixeira", activity: "Code Review", comment: "Revisão do PR #123." },
 ];
 
-export default function ActivitiesPage() {
+export default function ApontamentosPage() {
   const { toast } = useToast();
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
