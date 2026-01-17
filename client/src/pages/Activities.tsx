@@ -159,6 +159,7 @@ const MOCK_DATA = [
 export default function ActivitiesPage() {
   const { toast } = useToast();
   const [date, setDate] = useState<Date | undefined>(new Date());
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [hours, setHours] = useState<string>("0");
   const [minutes, setMinutes] = useState<string>("00");
   const [activity, setActivity] = useState<string>("");
@@ -213,7 +214,7 @@ export default function ActivitiesPage() {
             
             {/* Data */}
             <ADOField label="Data *">
-              <Popover>
+              <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                 <PopoverTrigger asChild>
                   <button className="w-full h-8 px-2 text-sm border border-[#C8C6C4] rounded-sm hover:border-[#323130] focus:outline-none focus:border-[#0078D4] focus:ring-1 focus:ring-[#0078D4] bg-white flex items-center gap-2 text-[#201F1E]">
                     <CalendarIcon className="w-3.5 h-3.5 text-[#605E5C]" />
@@ -224,7 +225,10 @@ export default function ActivitiesPage() {
                   <Calendar
                     mode="single"
                     selected={date}
-                    onSelect={setDate}
+                    onSelect={(newDate) => {
+                      setDate(newDate);
+                      setIsCalendarOpen(false);
+                    }}
                     initialFocus
                     locale={ptBR}
                     className="bg-white w-full"
