@@ -178,8 +178,8 @@ export default function ApontamentosPage() {
   const { toast } = useToast();
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const [hours, setHours] = useState<string>("0");
-  const [minutes, setMinutes] = useState<string>("00");
+  const [hours, setHours] = useState<string | undefined>(undefined);
+  const [minutes, setMinutes] = useState<string | undefined>(undefined);
   const [activity, setActivity] = useState<string>("");
   const [comment, setComment] = useState("");
 
@@ -188,10 +188,10 @@ export default function ApontamentosPage() {
   const MINUTES_OPTIONS = ["00", "15", "30", "45"];
 
   const handleSave = () => {
-    if (!activity) {
+    if (!date || hours === undefined || minutes === undefined || !activity) {
       toast({
         title: "Campos obrigatórios",
-        description: "Por favor, selecione uma atividade.",
+        description: "Por favor, preencha todos os campos obrigatórios (Data, Hora, Minutos e Atividade).",
         variant: "destructive",
       });
       return;
@@ -205,6 +205,8 @@ export default function ApontamentosPage() {
     // Reset fields
     setComment("");
     setActivity("");
+    setHours(undefined);
+    setMinutes(undefined);
   };
 
   const handleEdit = (row: any) => {
@@ -261,6 +263,7 @@ export default function ApontamentosPage() {
             <ADODropdown 
               label="Hora *" 
               options={HOURS_OPTIONS} 
+              placeholder="Selecionar..."
               value={hours}
               onSelect={setHours}
             />
@@ -269,6 +272,7 @@ export default function ApontamentosPage() {
             <ADODropdown 
               label="Minutos *" 
               options={MINUTES_OPTIONS} 
+              placeholder="Selecionar..."
               value={minutes}
               onSelect={setMinutes}
             />
