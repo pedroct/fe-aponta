@@ -188,10 +188,16 @@ export default function ApontamentosPage() {
   const MINUTES_OPTIONS = ["00", "15", "30", "45"];
 
   const handleSave = () => {
-    if (!date || hours === undefined || minutes === undefined || !activity) {
+    const missingFields = [];
+    if (!date) missingFields.push("Data");
+    if (hours === undefined) missingFields.push("Hora");
+    if (minutes === undefined) missingFields.push("Minutos");
+    if (!activity) missingFields.push("Atividade");
+
+    if (missingFields.length > 0) {
       toast({
         title: "Campos obrigatórios",
-        description: "Por favor, preencha todos os campos obrigatórios (Data, Hora, Minutos e Atividade).",
+        description: `Por favor, preencha o(s) campo(s): ${missingFields.join(", ")}.`,
         variant: "destructive",
       });
       return;
