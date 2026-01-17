@@ -284,16 +284,18 @@ export default function ApontamentosPage() {
             />
 
             {/* Atividade */}
-            <ADODropdown 
-              label="Atividade *" 
-              options={ACTIVITIES} 
-              placeholder="Selecionar..."
-              value={activity}
-              onSelect={setActivity}
-            />
+            <div className="md:col-span-2">
+              <ADODropdown 
+                label="Atividade *" 
+                options={ACTIVITIES} 
+                placeholder="Selecionar..."
+                value={activity}
+                onSelect={setActivity}
+              />
+            </div>
 
             {/* Comentário */}
-            <div className="md:col-span-2">
+            <div className="md:col-span-1">
               <ADOField label="Comentário">
                 <input 
                   type="text"
