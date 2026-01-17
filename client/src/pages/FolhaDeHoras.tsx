@@ -23,7 +23,7 @@ const TabelaApontamentosGrid = ({ dataInicio }: { dataInicio: Date }) => {
   const [apontamentos, setApontamentos] = useState<LinhaApontamento[]>([
     {
       id: "1",
-      idTarefa: "1 01",
+      idTarefa: "01",
       titulo: "GESTÃO DE PROJETOS",
       projeto: "",
       nivel: 0,
@@ -33,9 +33,9 @@ const TabelaApontamentosGrid = ({ dataInicio }: { dataInicio: Date }) => {
     },
     {
       id: "2",
-      idTarefa: "2 01.01",
+      idTarefa: "01.01",
       titulo: "ATIVIDADES DE PROJETO",
-      projeto: "GESTÃO DE PROJETOS",
+      projeto: "01",
       nivel: 1,
       expandido: true,
       horas: {},
@@ -43,9 +43,9 @@ const TabelaApontamentosGrid = ({ dataInicio }: { dataInicio: Date }) => {
     },
     {
       id: "3",
-      idTarefa: "3 01.01.01",
+      idTarefa: "01.01.01",
       titulo: "HU de Desenvolvimento",
-      projeto: "ATIVIDADES DE PROJETO",
+      projeto: "01.01",
       nivel: 2,
       expandido: true,
       horas: {},
@@ -53,9 +53,9 @@ const TabelaApontamentosGrid = ({ dataInicio }: { dataInicio: Date }) => {
     },
     {
       id: "4",
-      idTarefa: "4 C01",
+      idTarefa: "C01",
       titulo: "Implementar Extensão",
-      projeto: "HU de Desenvolvimento",
+      projeto: "01.01.01",
       nivel: 3,
       expandido: true,
       horas: {
@@ -67,9 +67,9 @@ const TabelaApontamentosGrid = ({ dataInicio }: { dataInicio: Date }) => {
     },
     {
       id: "5",
-      idTarefa: "6 01.01.02",
+      idTarefa: "01.01.02",
       titulo: "Documentação do Projeto",
-      projeto: "ATIVIDADES DE PROJETO",
+      projeto: "01.01",
       nivel: 2,
       expandido: true,
       horas: {},
@@ -77,9 +77,9 @@ const TabelaApontamentosGrid = ({ dataInicio }: { dataInicio: Date }) => {
     },
     {
       id: "6",
-      idTarefa: "5 C02",
+      idTarefa: "C02",
       titulo: "Documentação do Projeto",
-      projeto: "Documentação do Projeto",
+      projeto: "01.01.02",
       nivel: 3,
       expandido: true,
       horas: {
@@ -89,6 +89,33 @@ const TabelaApontamentosGrid = ({ dataInicio }: { dataInicio: Date }) => {
       }
     }
   ]);
+
+  const toggleExpandir = (id: string) => {
+    setApontamentos(prev => prev.map(item => {
+      if (item.id === id) {
+        return { ...item, expandido: !item.expandido };
+      }
+      return item;
+    }));
+  };
+
+  const isVisivel = (item: LinhaApontamento) => {
+    if (item.nivel === 0) return true;
+    
+    // Para tarefas (nivel 3), o pai é o item cujo idTarefa é item.projeto
+    if (item.nivel === 3) {
+      const pai = apontamentos.find(a => a.idTarefa === item.projeto);
+      return pai ? pai.expandido && isVisivel(pai) : true;
+    }
+    
+    // Para níveis hierárquicos (Épico, Feature, HU), o pai é baseado no idTarefa
+    const partes = item.idTarefa.split('.');
+    const idTarefaPai = partes.slice(0, -1).join('.');
+    if (!idTarefaPai) return true;
+    
+    const pai = apontamentos.find(a => a.idTarefa === idTarefaPai);
+    return pai ? pai.expandido && isVisivel(pai) : true;
+  };
 
   const diasDaSemana = Array.from({ length: 7 }, (_, i) => addDays(dataInicio, i));
 
@@ -106,7 +133,9 @@ const TabelaApontamentosGrid = ({ dataInicio }: { dataInicio: Date }) => {
   };
 
   const calcularTotalDia = (dataStr: string) => {
-    return apontamentos.reduce((acc, item) => acc + (parseFloat(item.horas[dataStr]) || 0), 0);
+    return apontamentos
+      .filter(item => !item.isHeader && isVisivel(item))
+      .reduce((acc, item) => acc + (parseFloat(item.horas[dataStr]) || 0), 0);
   };
 
   return (
@@ -115,7 +144,7 @@ const TabelaApontamentosGrid = ({ dataInicio }: { dataInicio: Date }) => {
         <thead>
           <tr className="bg-[#FAF9F8] border-b border-[#EAEAEA]">
             <th className="p-2 border-r border-[#EAEAEA] w-8"></th>
-            <th className="p-2 border-r border-[#EAEAEA] w-12 text-center text-[10px] text-[#605E5C] uppercase">ID</th>
+            <th className="p-2 border-r border-[#EAEAEA] w-24 text-center text-[10px] text-[#605E5C] uppercase">ID</th>
             <th className="p-2 border-r border-[#EAEAEA] min-w-[300px] text-left">Título</th>
             {diasDaSemana.map((dia) => (
               <th key={dia.toString()} className="p-2 border-r border-[#EAEAEA] w-24 text-center">
@@ -129,37 +158,55 @@ const TabelaApontamentosGrid = ({ dataInicio }: { dataInicio: Date }) => {
           </tr>
         </thead>
         <tbody>
-          {apontamentos.map((item) => (
-            <tr key={item.id} className={cn("border-b border-[#EAEAEA] hover:bg-[#F3F2F1] transition-colors", item.isHeader && "bg-[#FAF9F8]/50")}>
-              <td className="p-1 border-r border-[#EAEAEA] text-center">
-                {item.nivel < 3 ? <ChevronDown className="w-3 h-3 text-[#605E5C] cursor-pointer" /> : null}
-              </td>
-              <td className="p-1 border-r border-[#EAEAEA] text-center text-[10px] text-[#605E5C]">{item.idTarefa}</td>
-              <td className="p-1 border-r border-[#EAEAEA]">
-                <div className="flex items-center" style={{ paddingLeft: `${item.nivel * 16}px` }}>
-                   <span className={cn(item.isHeader ? "font-bold text-[11px] uppercase" : "text-sm")}>{item.titulo}</span>
-                </div>
-              </td>
-              {diasDaSemana.map((dia) => {
-                const dataStr = format(dia, "yyyy-MM-dd");
-                return (
-                  <td key={dataStr} className="p-0 border-r border-[#EAEAEA]">
-                    {!item.isHeader && (
-                      <input
-                        type="text"
-                        value={item.horas[dataStr] || ""}
-                        onChange={(e) => handleHoraChange(item.id, dataStr, e.target.value)}
-                        className="w-full h-8 text-center bg-transparent focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0078D4] transition-all"
-                      />
-                    )}
-                  </td>
-                );
-              })}
-              <td className="p-2 bg-[#F3F2F1]/50 text-center font-semibold">
-                {!item.isHeader ? calcularTotalLinha(item.horas) : ""}
-              </td>
-            </tr>
-          ))}
+          {apontamentos.map((item) => {
+            if (!isVisivel(item)) return null;
+            
+            return (
+              <tr key={item.id} className={cn("border-b border-[#EAEAEA] hover:bg-[#F3F2F1] transition-colors", item.isHeader && "bg-[#FAF9F8]/50")}>
+                <td className="p-1 border-r border-[#EAEAEA] text-center">
+                  {item.nivel < 3 ? (
+                    <button onClick={() => toggleExpandir(item.id)} className="p-1 hover:bg-[#E1DFDD] rounded-sm">
+                      {item.expandido ? (
+                        <ChevronDown className="w-3 h-3 text-[#605E5C]" />
+                      ) : (
+                        <ChevronRightIcon className="w-3 h-3 text-[#605E5C]" />
+                      )}
+                    </button>
+                  ) : null}
+                </td>
+                <td className="p-1 border-r border-[#EAEAEA] text-center text-[10px] text-[#605E5C] font-mono">{item.idTarefa}</td>
+                <td className="p-1 border-r border-[#EAEAEA]">
+                  <div className="flex items-center" style={{ paddingLeft: `${item.nivel * 16}px` }}>
+                     <span className={cn(item.isHeader ? "font-bold text-[11px] uppercase tracking-tight" : "text-sm")}>
+                        {item.nivel === 0 && "👑 "}
+                        {item.nivel === 1 && "🏆 "}
+                        {item.nivel === 2 && "📘 "}
+                        {item.nivel === 3 && "📋 "}
+                        {item.titulo}
+                     </span>
+                  </div>
+                </td>
+                {diasDaSemana.map((dia) => {
+                  const dataStr = format(dia, "yyyy-MM-dd");
+                  return (
+                    <td key={dataStr} className="p-0 border-r border-[#EAEAEA]">
+                      {!item.isHeader && (
+                        <input
+                          type="text"
+                          value={item.horas[dataStr] || ""}
+                          onChange={(e) => handleHoraChange(item.id, dataStr, e.target.value)}
+                          className="w-full h-8 text-center bg-transparent focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0078D4] transition-all"
+                        />
+                      )}
+                    </td>
+                  );
+                })}
+                <td className="p-2 bg-[#F3F2F1]/50 text-center font-semibold">
+                  {!item.isHeader ? calcularTotalLinha(item.horas) : ""}
+                </td>
+              </tr>
+            );
+          })}
           <tr className="bg-[#F3F2F1] font-bold">
             <td colSpan={3} className="p-2 border-r border-[#EAEAEA] text-right uppercase text-xs">Total</td>
             {diasDaSemana.map((dia) => (
@@ -168,7 +215,9 @@ const TabelaApontamentosGrid = ({ dataInicio }: { dataInicio: Date }) => {
               </td>
             ))}
             <td className="p-2 text-center text-[#0078D4]">
-              {apontamentos.reduce((acc, item) => acc + calcularTotalLinha(item.horas), 0)}
+              {apontamentos
+                .filter(item => !item.isHeader && isVisivel(item))
+                .reduce((acc, item) => acc + calcularTotalLinha(item.horas), 0)}
             </td>
           </tr>
         </tbody>
