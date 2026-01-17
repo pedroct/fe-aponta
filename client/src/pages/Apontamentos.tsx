@@ -244,8 +244,10 @@ export default function ApontamentosPage() {
                     mode="single"
                     selected={date}
                     onSelect={(newDate) => {
-                      setDate(newDate);
-                      setIsCalendarOpen(false);
+                      if (newDate) {
+                        setDate(newDate);
+                        setIsCalendarOpen(false);
+                      }
                     }}
                     initialFocus
                     locale={ptBR}
