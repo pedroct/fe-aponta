@@ -192,15 +192,15 @@ export default function ActivitiesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF9F8] flex flex-col font-['Segoe_UI',_Tahoma,_Geneva,_Verdana,_sans-serif]">
+    <div className="min-h-screen bg-[#FAF9F8] flex flex-col font-['Segoe_UI',_Tahoma,_Geneva,_Verdana,_sans-serif] pt-4">
       {/* Content */}
       <div className="flex-1 flex flex-col">
         {/* Header with Form Fields */}
         <ADOHeader title="Apontamento de Horas">
-          <div className="grid grid-cols-1 md:grid-cols-6 gap-4 w-full items-end pb-1">
+          <div className="grid grid-cols-1 md:grid-cols-7 gap-4 w-full items-end pb-1">
             
             {/* Data */}
-            <ADOField label="Data">
+            <ADOField label="Data *">
               <Popover>
                 <PopoverTrigger asChild>
                   <button className="w-full h-8 px-2 text-sm border border-[#C8C6C4] rounded-sm hover:border-[#323130] focus:outline-none focus:border-[#0078D4] focus:ring-1 focus:ring-[#0078D4] bg-white flex items-center gap-2 text-[#201F1E]">
@@ -208,13 +208,14 @@ export default function ActivitiesPage() {
                     {date ? format(date, "dd/MM/yyyy", { locale: ptBR }) : "dd/mm/aaaa"}
                   </button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="w-auto p-0 bg-white shadow-xl border border-[#C8C6C4] z-[100]" align="start">
                   <Calendar
                     mode="single"
                     selected={date}
                     onSelect={setDate}
                     initialFocus
                     locale={ptBR}
+                    className="bg-white"
                   />
                 </PopoverContent>
               </Popover>
@@ -222,7 +223,7 @@ export default function ActivitiesPage() {
 
             {/* Hora */}
             <ADODropdown 
-              label="Hora" 
+              label="Hora *" 
               options={HOURS_OPTIONS} 
               value={hours}
               onSelect={setHours}
@@ -230,7 +231,7 @@ export default function ActivitiesPage() {
 
             {/* Minutos */}
             <ADODropdown 
-              label="Minutos" 
+              label="Minutos *" 
               options={MINUTES_OPTIONS} 
               value={minutes}
               onSelect={setMinutes}
@@ -238,7 +239,7 @@ export default function ActivitiesPage() {
 
             {/* Atividade */}
             <ADODropdown 
-              label="Atividade" 
+              label="Atividade *" 
               options={ACTIVITIES} 
               placeholder="Selecionar..."
               value={activity}
@@ -246,23 +247,25 @@ export default function ActivitiesPage() {
             />
 
             {/* Comentário */}
-            <ADOField label="Comentário">
-              <input 
-                type="text"
-                maxLength={100}
-                placeholder="Comentário"
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                className="w-full h-8 px-2 text-sm border border-[#C8C6C4] rounded-sm hover:border-[#323130] focus:outline-none focus:border-[#0078D4] focus:ring-1 focus:ring-[#0078D4] transition-colors placeholder:text-[#605E5C]"
-                data-testid="input-comment"
-              />
-            </ADOField>
+            <div className="md:col-span-2">
+              <ADOField label="Comentário">
+                <input 
+                  type="text"
+                  maxLength={100}
+                  placeholder="Comentário"
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  className="w-full h-8 px-2 text-sm border border-[#C8C6C4] rounded-sm hover:border-[#323130] focus:outline-none focus:border-[#0078D4] focus:ring-1 focus:ring-[#0078D4] transition-colors placeholder:text-[#605E5C]"
+                  data-testid="input-comment"
+                />
+              </ADOField>
+            </div>
 
             {/* Botão Salvar */}
-            <div className="flex">
+            <div className="flex justify-start">
               <button 
                 onClick={handleSave}
-                className="h-8 px-4 bg-[#0078D4] text-white text-sm font-semibold rounded-sm hover:bg-[#106EBE] flex items-center justify-center gap-2 transition-colors w-full"
+                className="h-8 px-6 bg-[#0078D4] text-white text-sm font-semibold rounded-sm hover:bg-[#106EBE] flex items-center justify-center gap-2 transition-colors w-fit min-w-[100px]"
                 data-testid="button-save"
               >
                 <Save className="w-4 h-4" />
