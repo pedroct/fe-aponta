@@ -1,0 +1,37 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=${VITE_API_URL:-https://api-aponta.pedroct.com.br/api/v1}
+        - VITE_AZURE_ORG=${VITE_AZURE_ORG:-sefaz-ceara-lab}
+        - VITE_AZURE_PROJECT=${VITE_AZURE_PROJECT:-DEV}
+        - VITE_AZURE_PAT=${VITE_AZURE_PAT}
+    container_name: aponta-frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+    environment:
+      - TZ=America/Fortaleza
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    networks:
+      - aponta-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.aponta-frontend.rule=Host(`aponta.pedroct.com.br`)"
+      - "traefik.http.routers.aponta-frontend.entrypoints=websecure"
+      - "traefik.http.routers.aponta-frontend.tls.certresolver=cloudflare"
+
+networks:
+  aponta-network:
+    # Em desenvolvimento: cria rede local
+    # Em produção: usar docker-compose.prod.yml com rede externa
+    driver: bridge

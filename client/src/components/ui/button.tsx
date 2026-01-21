@@ -26,6 +26,7 @@ const buttonVariants = cva(
         // @replit no hover, transparent border
         ghost: "border border-transparent",
         link: "text-primary underline-offset-4 hover:underline",
+        azure: "bg-[#0078D4] text-white hover:bg-[#106EBE] rounded-sm",
       },
       size: {
         // @replit changed sizes
@@ -33,6 +34,7 @@ const buttonVariants = cva(
         sm: "min-h-8 rounded-md px-3 text-xs",
         lg: "min-h-10 rounded-md px-8",
         icon: "h-9 w-9",
+        azure: "h-8 px-3 py-1.5 text-xs",
       },
     },
     defaultVariants: {

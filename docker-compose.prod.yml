@@ -1,0 +1,12 @@
+# docker-compose.prod.yml
+# Usar na VPS com: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+services:
+  frontend:
+    networks:
+      - aponta-network
+
+networks:
+  aponta-network:
+    external: true
+    name: api-aponta-vps_default

@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Bash(curl:*)",
+      "Bash(npx tsc:*)",
+      "Bash(timeout 5 npm run dev:*)",
+      "Bash(python:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run test:run:*)",
+      "mcp__TestSprite__testsprite_bootstrap",
+      "mcp__TestSprite__testsprite_generate_code_summary",
+      "mcp__TestSprite__testsprite_generate_standardized_prd",
+      "mcp__TestSprite__testsprite_generate_frontend_test_plan",
+      "Bash(node:*)"
+    ]
+  }
+}

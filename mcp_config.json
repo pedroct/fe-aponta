@@ -1,0 +1,33 @@
+{
+    "mcpServers": {
+        "ai-context": {
+            "command": "npx",
+            "args": ["@ai-coders/context", "mcp"]
+        },
+        "hostinger": {
+            "command": "hostinger-api-mcp",
+            "args": [],
+            "env": {
+                "HOSTINGER_API_TOKEN": "b0oeKaIuOAUUsVjf2Fzd1tFltCnYBzPEzdBPjz7X1d504292",
+                "DEBUG": "false"
+            }
+        },
+        "context7": {
+            "type": "http",
+            "url": "https://mcp.context7.com/mcp",
+            "headers": {
+                "CONTEXT7_API_KEY": "ctx7sk-d06b4dfa-3a1e-4c96-ad4b-015b474b97dc"
+            }
+        },
+        "TestSprite": {
+        "command": "npx",
+        "args": [
+            "@testsprite/testsprite-mcp@latest"
+        ],
+        "env": {
+            "API_KEY": "sk-user-UDiTwCt-5quAraQCfgwSDDtcp2GuyTYyaN_MlV-FU5VwFJMLoWriu5_voge64qYSkminP1eKFyGDnb_rMqAsy-G9-L8M_YVQf7TtQappK-YydboVcRL_TWQu0dhERZFnMNk"
+        }
+        }
+    }
+    }
+}

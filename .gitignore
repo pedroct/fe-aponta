@@ -4,3 +4,7 @@ dist
 server/public
 vite.config.ts.*
 *.tar.gz
+.env
+mcp_config.jsondocs/migration/BACKEND_MIGRATION_GUIDE.md
+docs/migration/MIGRATION_INSTRUCTIONS.md
+testsprite_tests/tmp/

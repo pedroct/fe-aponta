@@ -1,0 +1,44 @@
+name: Deploy Frontend Production
+
+on:
+  push:
+    branches: [main]
+
+env:
+  DEPLOY_PATH: ${{ secrets.DEPLOY_PATH_PRD }}
+
+jobs:
+  deploy:
+    name: Deploy Production
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Configurar SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Sincronizar código
+        run: |
+          # Sincronizar código
+          rsync -avz --delete \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='.env' \
+            --exclude='dist' \
+            --exclude='.github' \
+            ./ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ env.DEPLOY_PATH }}/
+
+          # Reiniciar apenas o container do frontend (não afeta o backend)
+          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "cd /home/ubuntu/aponta-sefaz/production && docker compose up -d --build --force-recreate --no-deps frontend"
+
+      - name: Health Check
+        run: |
+          sleep 20
+          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "docker exec fe-aponta-prod wget --quiet --tries=1 --spider http://localhost/health || exit 1"

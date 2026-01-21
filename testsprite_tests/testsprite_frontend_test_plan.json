@@ -1,0 +1,484 @@
+[
+  {
+    "id": "TC001",
+    "title": "Successful time entry creation",
+    "description": "Verify that a user can successfully create a time entry with valid task selection, date, duration, activity type, and comments.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open the 'Add Time Entry' modal in the application."
+      },
+      {
+        "type": "action",
+        "description": "Select a valid task from the hierarchical work items tree."
+      },
+      {
+        "type": "action",
+        "description": "Input a valid date not in the future."
+      },
+      {
+        "type": "action",
+        "description": "Set duration using shortcut 1h."
+      },
+      {
+        "type": "action",
+        "description": "Select a valid activity type."
+      },
+      {
+        "type": "action",
+        "description": "Optionally add comments."
+      },
+      {
+        "type": "action",
+        "description": "Click the 'Save' button."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the time entry is saved locally and displayed in the time entries list."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify synchronization to Azure DevOps updates CompletedWork and RemainingWork of the selected task."
+      }
+    ]
+  },
+  {
+    "id": "TC002",
+    "title": "Validation rejects negative duration",
+    "description": "Verify that the system does not allow entering negative duration values and displays appropriate validation errors.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open the 'Add Time Entry' modal."
+      },
+      {
+        "type": "action",
+        "description": "Select a valid task."
+      },
+      {
+        "type": "action",
+        "description": "Input a negative duration value (-1h)."
+      },
+      {
+        "type": "action",
+        "description": "Fill remaining required fields with valid data."
+      },
+      {
+        "type": "action",
+        "description": "Attempt to save the time entry."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that the system prevents saving and shows an error message indicating negative hours are not allowed."
+      }
+    ]
+  },
+  {
+    "id": "TC003",
+    "title": "Validation rejects future dates",
+    "description": "Verify that the system prevents selecting a date in the future when creating a time entry.",
+    "category": "error handling",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open the 'Add Time Entry' modal."
+      },
+      {
+        "type": "action",
+        "description": "Select a valid task."
+      },
+      {
+        "type": "action",
+        "description": "Input a date set in the future."
+      },
+      {
+        "type": "action",
+        "description": "Fill other required fields with valid data."
+      },
+      {
+        "type": "action",
+        "description": "Attempt to save the time entry."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that saving is prevented and an error message indicates future dates are not allowed."
+      }
+    ]
+  },
+  {
+    "id": "TC004",
+    "title": "Validation rejects total daily hours exceeding 24",
+    "description": "Verify that the system disallows time entries that cause the daily total hours to exceed 24 hours for a user.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Create time entries summing up to 23 hours for a particular day."
+      },
+      {
+        "type": "action",
+        "description": "Open the 'Add Time Entry' modal for the same day."
+      },
+      {
+        "type": "action",
+        "description": "Select a valid task."
+      },
+      {
+        "type": "action",
+        "description": "Input a duration of 2 hours."
+      },
+      {
+        "type": "action",
+        "description": "Fill other required fields."
+      },
+      {
+        "type": "action",
+        "description": "Attempt to save the time entry."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the system prevents saving and shows an error indicating exceeding daily hour limit."
+      }
+    ]
+  },
+  {
+    "id": "TC005",
+    "title": "Hierarchical Work Items tree expand and collapse",
+    "description": "Verify that the hierarchical work items tree expands and collapses correctly at various levels (Epic, Feature, User Story, Task/Bug).",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open the Work Items tree."
+      },
+      {
+        "type": "action",
+        "description": "Click to expand the Epic node."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the Features under the Epic are displayed."
+      },
+      {
+        "type": "action",
+        "description": "Expand a Feature node."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify User Stories under the Feature are displayed."
+      },
+      {
+        "type": "action",
+        "description": "Collapse the Epic node."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify all nested nodes disappear."
+      }
+    ]
+  },
+  {
+    "id": "TC006",
+    "title": "Task Search autocomplete with debounce and pagination",
+    "description": "Verify that the task search input provides autocomplete suggestions with debounce to minimize API calls, supports pagination, and displays cached results.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Focus on the Task Search input field."
+      },
+      {
+        "type": "action",
+        "description": "Type a partial task ID or title slowly, observing that API calls are not sent on every keystroke due to debounce."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify autocomplete suggestions are displayed after debounce delay."
+      },
+      {
+        "type": "action",
+        "description": "Navigate to next page of results if available."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that paginated results are correctly displayed."
+      },
+      {
+        "type": "action",
+        "description": "Repeat previous search term."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify cached results are displayed without additional API request."
+      }
+    ]
+  },
+  {
+    "id": "TC007",
+    "title": "Azure DevOps synchronization resilient to API outages",
+    "description": "Verify that the app continues functioning and preserves local time entry data when the Azure DevOps API is unreachable, and synchronization resumes successfully once API is available again.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Simulate Azure DevOps API outage."
+      },
+      {
+        "type": "action",
+        "description": "Create and save time entries locally."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that entries are saved locally with no application crash or data loss."
+      },
+      {
+        "type": "action",
+        "description": "Restore Azure DevOps API availability."
+      },
+      {
+        "type": "action",
+        "description": "Trigger synchronization."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify all locally saved entries are synchronized successfully and Azure DevOps work items are updated."
+      }
+    ]
+  },
+  {
+    "id": "TC008",
+    "title": "Only Task and Bug work items updated in Azure DevOps",
+    "description": "Verify that CompletedWork and RemainingWork updates in Azure DevOps are only sent for Task and Bug work items, ignoring other types.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Select a Task work item and create a time entry."
+      },
+      {
+        "type": "action",
+        "description": "Select a Bug work item and create a time entry."
+      },
+      {
+        "type": "action",
+        "description": "Select a Feature or Epic work item and attempt to create a time entry."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify synchronization occurs for Task and Bug types but not for Feature or Epic."
+      }
+    ]
+  },
+  {
+    "id": "TC009",
+    "title": "Weekly Hours Grid displays correct totals and overload indicators",
+    "description": "Verify that the weekly hours grid correctly sums daily and weekly hours per user, and correctly displays visual overload indicators for days exceeding 8h.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Create multiple time entries for various days of the current week."
+      },
+      {
+        "type": "action",
+        "description": "Open the Weekly Hours Grid view."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify daily totals are correct sums of time entries."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify weekly total is sum of all days."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify days with total hours > 8 show overload visual indicators."
+      }
+    ]
+  },
+  {
+    "id": "TC010",
+    "title": "Authentication with Azure DevOps Personal Access Token (PAT)",
+    "description": "Verify that users can authenticate using a valid Azure DevOps PAT and are denied access with invalid or missing token.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Launch the app and enter a valid Azure DevOps PAT."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify user is authenticated and able to access functionalities."
+      },
+      {
+        "type": "action",
+        "description": "Log out and relaunch the app."
+      },
+      {
+        "type": "action",
+        "description": "Enter an invalid PAT."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify user is denied access with appropriate error message."
+      },
+      {
+        "type": "action",
+        "description": "Launch the app without entering PAT."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify application prevents access and prompts for authentication."
+      }
+    ]
+  },
+  {
+    "id": "TC011",
+    "title": "Average time to record a time entry is under 30 seconds",
+    "description": "Measure the average time taken by a user to open the Add Time Entry modal, fill in required fields, and save a valid entry, ensuring it is under 30 seconds.",
+    "category": "performance",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Record start time."
+      },
+      {
+        "type": "action",
+        "description": "Open Add Time Entry modal."
+      },
+      {
+        "type": "action",
+        "description": "Fill task, date, duration, activity type and optional comments."
+      },
+      {
+        "type": "action",
+        "description": "Click save."
+      },
+      {
+        "type": "action",
+        "description": "Record end time."
+      },
+      {
+        "type": "assertion",
+        "description": "Calculate elapsed time and verify it is less than 30 seconds."
+      }
+    ]
+  },
+  {
+    "id": "TC012",
+    "title": "Data validation prevents RemainingWork from becoming negative",
+    "description": "Verify that after synchronization, RemainingWork for any task is never updated to a negative value, even if user tries to log more hours than remaining.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Check current RemainingWork value of a selected task."
+      },
+      {
+        "type": "action",
+        "description": "Create a time entry with duration exceeding RemainingWork."
+      },
+      {
+        "type": "action",
+        "description": "Save the entry and trigger synchronization."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify RemainingWork in Azure DevOps is updated to zero and not negative."
+      }
+    ]
+  },
+  {
+    "id": "TC013",
+    "title": "Local data caching and offline support",
+    "description": "Verify the application correctly caches data locally and allows creating and storing time entries offline, synchronizing them automatically once connection is restored.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Launch the application with active internet connection."
+      },
+      {
+        "type": "action",
+        "description": "Create and save some time entries."
+      },
+      {
+        "type": "action",
+        "description": "Disconnect internet to simulate offline mode."
+      },
+      {
+        "type": "action",
+        "description": "Create additional time entries."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that new entries are stored locally and visible in the UI."
+      },
+      {
+        "type": "action",
+        "description": "Reconnect internet."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify all pending entries are synchronized with Azure DevOps automatically."
+      }
+    ]
+  },
+  {
+    "id": "TC014",
+    "title": "UI responsiveness and fast interactions",
+    "description": "Verify that the application interface loads quickly and user interactions such as opening modal, expanding work item nodes, and searching tasks respond smoothly without lag.",
+    "category": "performance",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Load the main application page."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the UI is fully rendered within 2 seconds."
+      },
+      {
+        "type": "action",
+        "description": "Open 'Add Time Entry' modal."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the modal opens smoothly within 0.5 seconds."
+      },
+      {
+        "type": "action",
+        "description": "Expand and collapse hierarchical work items."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify nodes expand/collapse smoothly with no visible lag."
+      },
+      {
+        "type": "action",
+        "description": "Focus task search and type a few characters."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify autocomplete suggestions appear promptly with no delay."
+      }
+    ]
+  }
+]

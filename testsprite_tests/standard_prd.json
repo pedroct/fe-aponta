@@ -1,0 +1,127 @@
+{
+  "meta": {
+    "project": "Apontamentos",
+    "date": "2026-01-15",
+    "prepared_by": "Software Development Manager"
+  },
+  "product_overview": "Apontamentos is a web application for time logging and work tracking integrated with Azure DevOps, designed to centralize time entries, automatically sync with Work Items, and provide visibility into progress by team, project, and task.",
+  "core_goals": [
+    "Enable developers and analysts to efficiently log hours by task.",
+    "Allow leaders and managers to monitor effort and project progress effectively.",
+    "Provide teams using Azure DevOps with seamless integration for planning and delivery tracking.",
+    "Ensure reliable synchronization between local data and Azure DevOps Work Items.",
+    "Deliver a responsive and user-friendly interface to facilitate quick and accurate time entry."
+  ],
+  "key_features": [
+    "Time Entry Form with fields for task selection, date, duration, activity type, and comments.",
+    "Shortcut durations for quick time input (e.g., 0.5h, 1h, 2h, 4h).",
+    "Data validation to ensure valid hours, no future dates, and required task selection.",
+    "Weekly Hours Grid displaying daily and weekly totals with visual indicators for overload (>8h/day).",
+    "Hierarchical Work Items tree structured by Epic, Feature, User Story, and Task/Bug levels with expandable and collapsible nodes.",
+    "Task Search with autocomplete by ID or title, paginated and cached results, and debounce to minimize API calls.",
+    "Azure DevOps Integration that updates CompletedWork and RemainingWork automatically, synchronizes status after each entry, and maintains local data availability when API is down.",
+    "Local data caching and offline support for reliability.",
+    "Authentication using Azure DevOps Personal Access Token (PAT) or equivalent for security."
+  ],
+  "user_flow_summary": [
+    "Launch Hour Entry Flow: User opens the app, clicks 'Add Time Entry,' fills in task, date, duration, activity type, and saves. Data is saved locally and synced with Azure DevOps.",
+    "Weekly Review Flow: User views the weekly grid to analyze daily and weekly totals and expands hierarchical tasks for detailed inspection."
+  ],
+  "validation_criteria": [
+    "No negative hours allowed in entries.",
+    "Total daily hours must not exceed 24 hours.",
+    "RemainingWork for tasks cannot be negative after updates.",
+    "Only Task and Bug work items are updated directly in Azure DevOps.",
+    "Average time to record a time entry is under 30 seconds.",
+    "Synchronization success rate is at least 99%.",
+    "Application continues to function and preserve local data during Azure DevOps API outages.",
+    "Responsive UI with fast loading times and smooth interactions.",
+    "Secure authentication ensuring only authorized users can access and modify data."
+  ],
+  "code_summary": {
+    "tech_stack": [
+      "TypeScript",
+      "React",
+      "Vite",
+      "Vitest",
+      "Tailwind CSS",
+      "PostCSS"
+    ],
+    "features": [
+      {
+        "name": "App Shell",
+        "description": "Entrada principal da aplicacao React e rotas basicas.",
+        "files": [
+          "client/src/App.tsx",
+          "client/src/main.tsx",
+          "client/index.html"
+        ]
+      },
+      {
+        "name": "Pagina Principal",
+        "description": "Tela principal com fluxo de atividades e interface central.",
+        "files": [
+          "client/src/pages/PaginaPrincipal.tsx"
+        ]
+      },
+      {
+        "name": "Modal de Adicao de Tempo",
+        "description": "Modal para adicionar tempo em atividades.",
+        "files": [
+          "client/src/components/custom/ModalAdicionarTempo.tsx"
+        ]
+      },
+      {
+        "name": "Hooks de Dominio",
+        "description": "Hooks para consumo de API, atividades, usuario atual e busca de work items.",
+        "files": [
+          "client/src/hooks/use-api.ts",
+          "client/src/hooks/use-atividades.ts",
+          "client/src/hooks/use-current-user.ts",
+          "client/src/hooks/use-search-work-items.ts"
+        ]
+      },
+      {
+        "name": "Cliente de API",
+        "description": "Camada de comunicacao com servicos HTTP.",
+        "files": [
+          "client/src/lib/api-client.ts"
+        ]
+      },
+      {
+        "name": "Componentes de UI",
+        "description": "Biblioteca local de componentes base de interface.",
+        "files": [
+          "client/src/components/ui/button.tsx",
+          "client/src/components/ui/dialog.tsx",
+          "client/src/components/ui/toast.tsx",
+          "client/src/components/ui/toaster.tsx",
+          "client/src/components/ui/tooltip.tsx",
+          "client/src/components/ui/work-item-icon.tsx"
+        ]
+      },
+      {
+        "name": "Estilos Globais",
+        "description": "Estilos globais e configuracoes de tema.",
+        "files": [
+          "client/src/index.css",
+          "postcss.config.js",
+          "tailwind.config.ts"
+        ]
+      },
+      {
+        "name": "Testes de Frontend",
+        "description": "Suites de testes para componentes, hooks e paginas.",
+        "files": [
+          "client/src/App.test.tsx",
+          "client/src/components/custom/ModalAdicionarTempo.test.tsx",
+          "client/src/hooks/use-atividades.test.ts",
+          "client/src/hooks/use-current-user.test.ts",
+          "client/src/pages/not-found.test.tsx",
+          "vitest.config.ts",
+          "vitest.setup.ts"
+        ]
+      }
+    ]
+  }
+}
